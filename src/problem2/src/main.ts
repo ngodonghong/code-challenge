@@ -26,6 +26,10 @@ class SwapForm {
     this.initializeDropdowns()
     this.initializeEventListeners()
     this.loadCurrencyData()
+
+    // Initial state: disable fields until From Currency is selected
+    this.inputAmountField.setDisabled(true)
+    this.outputCurrencyDropdown.setDisabled(true)
   }
 
   private initializeInputNumbers(): void {
@@ -200,6 +204,11 @@ class SwapForm {
           c => c.currency === currency && (c as any).walletAmount > 0
         )
       this.inputAmountField.setMaxButtonDisabled(!hasWalletBalance)
+
+      // Enable/disable other fields based on selection
+      const hasSelection = !!currency
+      this.inputAmountField.setDisabled(!hasSelection)
+      this.outputCurrencyDropdown.setDisabled(!hasSelection)
     }
 
     this.calculateOutputAmount()
