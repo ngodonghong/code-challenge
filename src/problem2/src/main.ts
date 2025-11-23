@@ -1,16 +1,8 @@
-import {
-  CustomDropdown,
-  CurrencyPrice,
-} from './components/customDropdown/customDropdown.js'
+import { CustomDropdown } from './components/customDropdown/customDropdown.js'
 import { InputNumber } from './components/inputNumber/inputNumber.js'
 import { Dashboard } from './components/dashboard/dashboard.js'
-
-interface SwapFormData {
-  inputAmount: number
-  outputAmount: number
-  inputCurrency: string
-  outputCurrency: string
-}
+import { fetchCurrencyPrices, fetchWalletData } from './apis/index.js'
+import { CurrencyPrice, SwapFormData } from './types'
 
 class SwapForm {
   private form: HTMLFormElement
@@ -115,7 +107,22 @@ class SwapForm {
     }
 
     // Create new loading promise
-    SwapForm.loadingPromise = this.fetchCurrencies()
+    SwapForm.loadingPromise = (async () => {
+      const data = await fetchCurrencyPrices()
+
+      // Get unique currencies with latest prices
+      const currencyMap = new Map<string, CurrencyPrice>()
+      data.forEach(item => {
+        const existing = currencyMap.get(item.currency)
+        if (!existing || new Date(item.date) > new Date(existing.date)) {
+          currencyMap.set(item.currency, item)
+        }
+      })
+
+      return Array.from(currencyMap.values()).sort((a, b) =>
+        a.currency.localeCompare(b.currency)
+      )
+    })()
 
     try {
       const currencies = await SwapForm.loadingPromise
@@ -126,40 +133,20 @@ class SwapForm {
     }
   }
 
-  private async fetchCurrencies(): Promise<CurrencyPrice[]> {
-    const response = await fetch('https://interview.switcheo.com/prices.json')
-    const data: CurrencyPrice[] = await response.json()
-
-    // Get unique currencies with latest prices
-    const currencyMap = new Map<string, CurrencyPrice>()
-    data.forEach(item => {
-      const existing = currencyMap.get(item.currency)
-      if (!existing || new Date(item.date) > new Date(existing.date)) {
-        currencyMap.set(item.currency, item)
-      }
-    })
-
-    return Array.from(currencyMap.values()).sort((a, b) =>
-      a.currency.localeCompare(b.currency)
-    )
-  }
-
   private async getWalletCurrencies(): Promise<CurrencyPrice[]> {
     try {
       // Load wallet data and currency prices in parallel
-      const [walletResponse, allCurrencies] = await Promise.all([
-        fetch('/api/wallet.json'),
+      const [walletData, allCurrencies] = await Promise.all([
+        fetchWalletData(),
         this.getAllCurrencies(),
       ])
 
-      const walletData = await walletResponse.json()
-
-      if (!walletData.success || !walletData.data.holdings) {
+      if (!walletData.holdings) {
         throw new Error('Invalid wallet data')
       }
 
       // Get currencies that user has in wallet
-      const walletCurrencies = walletData.data.holdings.map(
+      const walletCurrencies = walletData.holdings.map(
         (holding: any) => holding.currency
       )
 
@@ -170,7 +157,7 @@ class SwapForm {
 
       // Add holdings amount information to currency data
       return availableCurrencies.map(currency => {
-        const holding = walletData.data.holdings.find(
+        const holding = walletData.holdings.find(
           (h: any) => h.currency === currency.currency
         )
         return {

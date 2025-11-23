@@ -1,13 +1,4 @@
-export interface InputNumberOptions {
-  label: string
-  placeholder?: string
-  required?: boolean
-  min?: number
-  max?: number
-  step?: number
-  readonly?: boolean
-  showMaxButton?: boolean
-}
+import { InputNumberOptions } from '../../types'
 
 export class InputNumber {
   private container: HTMLElement
@@ -149,7 +140,7 @@ export class InputNumber {
   }
 
   private handleKeyPress(e: KeyboardEvent): void {
-    const char = String.fromCharCode(e.which)
+    const char = e.key
     const currentValue = this.inputElement.value
 
     // Allow digits, decimal point, backspace, delete, arrow keys, etc.
@@ -161,8 +152,7 @@ export class InputNumber {
       return // Allow single decimal point
     }
 
-    // Allow control keys (backspace, delete, arrow keys, etc.)
-    if (e.which <= 32 || e.ctrlKey || e.metaKey) {
+    if (e.ctrlKey || e.metaKey) {
       return
     }
 

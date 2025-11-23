@@ -1,8 +1,4 @@
-export interface CurrencyPrice {
-  currency: string
-  date: string
-  price: number
-}
+import { CurrencyPrice } from '../../types'
 
 export class CustomDropdown {
   private element: HTMLElement

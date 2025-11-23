@@ -1,66 +1,5 @@
-export interface UserData {
-  userId: string
-  username: string
-  email: string
-  firstName: string
-  lastName: string
-  avatar: string
-  dateJoined: string
-  lastLogin: string
-  preferences: {
-    currency: string
-    theme: string
-    notifications: {
-      email: boolean
-      push: boolean
-      priceAlerts: boolean
-    }
-    language: string
-  }
-  verification: {
-    email: boolean
-    phone: boolean
-    kyc: string
-  }
-  accountLevel: string
-}
-
-export interface WalletData {
-  userId: string
-  totalBalance: {
-    usd: number
-    btc: number
-  }
-  holdings: Array<{
-    currency: string
-    symbol: string
-    name: string
-    amount: number
-    usdValue: number
-    avgBuyPrice: number
-    totalInvested: number
-    profit: number
-    profitPercent: number
-    lastUpdated: string
-  }>
-  performance: {
-    totalProfitLoss: number
-    totalProfitLossPercent: number
-    dayChange: {
-      usd: number
-      percent: number
-    }
-    weekChange: {
-      usd: number
-      percent: number
-    }
-    monthChange: {
-      usd: number
-      percent: number
-    }
-  }
-  lastUpdated: string
-}
+import { UserData, WalletData } from '../../types/index.js'
+import { fetchUserData, fetchWalletData } from '../../apis/index.js'
 
 export class Dashboard {
   private walletData: WalletData | null = null
@@ -77,22 +16,14 @@ export class Dashboard {
       const minLoadingTime = new Promise(resolve => setTimeout(resolve, 800))
 
       // Load user and wallet data in parallel
-      const [userResponse, walletResponse] = await Promise.all([
-        fetch('/api/user.json'),
-        fetch('/api/wallet.json'),
+      const [userData, walletData] = await Promise.all([
+        fetchUserData(),
+        fetchWalletData(),
         minLoadingTime,
       ])
 
-      const userData = await userResponse.json()
-      const walletData = await walletResponse.json()
-
-      if (userData.success) {
-        this.userData = userData.data
-      }
-
-      if (walletData.success) {
-        this.walletData = walletData.data
-      }
+      this.userData = userData
+      this.walletData = walletData
 
       this.hideLoadingStates()
       this.updateUI()
