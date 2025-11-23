@@ -92,6 +92,58 @@ body {
   background-color: #cccccc;
 }
 
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+#confirm-swap {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-top: 0;
+  flex: 1;
+}
+
+.secondary-button {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.secondary-button:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+  color: #333;
+}
+
+.secondary-button:active {
+  transform: translateY(1px);
+}
+
+.secondary-button:disabled {
+  background-color: transparent;
+  border-color: #eee;
+  color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Media Queries for Responsive Design */
 
 /* Mobile phones (portrait) */

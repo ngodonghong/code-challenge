@@ -7,6 +7,7 @@ import { CurrencyPrice, SwapFormData } from './types'
 class SwapForm {
   private form: HTMLFormElement
   private confirmButton: HTMLButtonElement
+  private cancelButton: HTMLButtonElement
   private inputCurrencyDropdown!: CustomDropdown
   private outputCurrencyDropdown!: CustomDropdown
   private inputAmountField!: InputNumber
@@ -21,6 +22,9 @@ class SwapForm {
     this.confirmButton = document.getElementById(
       'confirm-swap'
     ) as HTMLButtonElement
+    this.cancelButton = document.getElementById(
+      'cancel-swap'
+    ) as HTMLButtonElement
 
     this.initializeInputNumbers()
     this.initializeDropdowns()
@@ -30,6 +34,7 @@ class SwapForm {
     // Initial state: disable fields until From Currency is selected
     this.inputAmountField.setDisabled(true)
     this.outputCurrencyDropdown.setDisabled(true)
+    this.confirmButton.disabled = true
   }
 
   private initializeInputNumbers(): void {
@@ -222,6 +227,9 @@ class SwapForm {
     // Handle confirm button click
     this.confirmButton.addEventListener('click', e => this.handleConfirmSwap(e))
 
+    // Handle cancel button click
+    this.cancelButton.addEventListener('click', () => this.handleCancel())
+
     // Input changes and currency changes are now handled in their respective components
   }
 
@@ -240,6 +248,10 @@ class SwapForm {
     } else {
       this.showValidationError()
     }
+  }
+
+  private handleCancel(): void {
+    this.resetForm()
   }
 
   private calculateOutputAmount(): void {
@@ -293,6 +305,9 @@ class SwapForm {
 
     // Update button state based on validation
     this.confirmButton.disabled = !isValid
+
+    // Update dirty state
+    this.updateDirtyState()
 
     // Validate currencies are selected and different
     const currenciesValid =
@@ -363,7 +378,7 @@ class SwapForm {
   }
 
   private resetForm(): void {
-    this.confirmButton.disabled = false
+    this.confirmButton.disabled = true
 
     // Reset input components
     this.inputAmountField.reset()
@@ -372,6 +387,23 @@ class SwapForm {
     // Reset custom dropdowns
     this.inputCurrencyDropdown.reset()
     this.outputCurrencyDropdown.reset()
+
+    // Reset to initial state
+    this.inputAmountField.setDisabled(true)
+    this.outputCurrencyDropdown.setDisabled(true)
+    this.inputAmountField.setMaxButtonDisabled(true)
+
+    this.updateDirtyState()
+  }
+
+  private updateDirtyState(): void {
+    const formData = this.getFormData()
+    const isDirty =
+      formData.inputAmount > 0 ||
+      formData.inputCurrency !== '' ||
+      formData.outputCurrency !== ''
+
+    this.cancelButton.disabled = !isDirty
   }
 }
 
