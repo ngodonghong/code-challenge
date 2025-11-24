@@ -1,8 +1,4 @@
-export interface CurrencyPrice {
-  currency: string
-  date: string
-  price: number
-}
+import { CurrencyPrice } from '../../types'
 
 export class CustomDropdown {
   private element: HTMLElement
@@ -172,6 +168,11 @@ export class CustomDropdown {
     const trigger = this.element.querySelector('.select-trigger') as HTMLElement
     if (trigger) {
       trigger.style.pointerEvents = disabled ? 'none' : 'auto'
+      if (disabled) {
+        this.element.classList.add('disabled')
+      } else {
+        this.element.classList.remove('disabled')
+      }
     }
   }
 

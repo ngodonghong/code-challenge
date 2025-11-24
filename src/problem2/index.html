@@ -8,6 +8,7 @@
       href="/src/components/customDropdown/customDropdown.css"
     />
     <link rel="stylesheet" href="/src/components/inputNumber/inputNumber.css" />
+    <link rel="stylesheet" href="/src/components/button/button.css" />
     <link rel="stylesheet" href="/src/components/dashboard/dashboard.css" />
   </head>
 
@@ -69,7 +70,12 @@
 
       <div id="output-amount"></div>
 
-      <button id="confirm-swap">CONFIRM SWAP</button>
+      <div class="button-group">
+        <button id="cancel-swap" type="button" class="btn" disabled>
+          CANCEL
+        </button>
+        <button id="confirm-swap" class="btn btn-primary">CONFIRM SWAP</button>
+      </div>
     </form>
     <script type="module" src="/src/main.ts"></script>
   </body>
